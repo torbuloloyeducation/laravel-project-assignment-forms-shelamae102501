@@ -1,5 +1,3 @@
-<x-layout title="Contact"><br><br><br><br>
-    <x-card>
+<x-layout title="Contact">
         <p>Contact us here!</p>
-    </x-card>
 </x-layout>
