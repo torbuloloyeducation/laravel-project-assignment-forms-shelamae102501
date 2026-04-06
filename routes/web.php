@@ -12,27 +12,45 @@ Route::view('/', 'welcome', [
         'Deploy to production',
     ],
 ]);
-
+Route::view('/', 'welcome');
 Route::view('/about', 'about');
 Route::view('/contact', 'contact');
+Route::view('/services', 'services');
+Route::view('/showcases', 'showcases');
+Route::view('/blog', 'blog');
 
-Route::get('/formtest', function(){
-    $emails = session()->get('$emails', []);
+Route::get('/formtest', function () {
+    return view('formtest');
+});
 
-    return view('formtest',[
-        'emails' => $emails,
+Route::post('/formtest', function () {
+    request()->validate([
+        'email' => 'required|email'
     ]);
+
+    $emails = session('emails', []);
+
+    if (!in_array(request('email'), $emails)) {
+        if (count($emails) >= 5) {
+            return back()->with('warning', 'Maximum of 5 emails only!');
+        }
+
+        $emails[] = request('email');
+        session(['emails' => $emails]);
+
+        return back()->with('success', 'Email added successfully!');
+    }
+
+    return back()->with('error', 'Email already exists!');
 });
 
-Route::post('/formtest', function(){
-    $email = request('email');
+Route::post('/formtest/delete', function () {
+    $emails = session('emails', []);
+    $index = request('index');
 
-    session()->push('$emails', $email);
+    if (array_key_exists($index, $emails)) {
+        array_splice($emails, $index, 1);
+        session(['emails' => $emails]);
+    }
 
-    return redirect('/formtest');
-});
-
-Route::get('/delete-emails', function(){
-    session()->forget('$emails');
-    return redirect('/formtest');
-});
+return redirect('/formtest')->with('success', 'Email deleted!');});

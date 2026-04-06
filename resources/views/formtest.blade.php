@@ -1,29 +1,62 @@
 <x-layout>
     <form method="POST" action="/formtest">
         @csrf
-<div class="space-y-12">
-    <div class="border-b border-white/10">
-      <div class="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-12 p-10 bg-gray-800 rounded-lg">
-        <div class="sm:col-span-4">
-          <label for="email" class="block text-sm/6 font-medium text-white">Email</label>
-          <div class="mt-2">
-            <div class="flex items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-500">
-              <input id="email" type="email" name="email" placeholder="juandelacruz@umindanao.edu.ph" class="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6" />
+        <div class="space-y-12">
+            <div class="border-b border-white/10">
+                <div class="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-12 p-10 bg-gray-800 rounded-lg">
+                    <div class="sm:col-span-4">
+                        <label for="email" class="block text-sm/6 font-medium text-white">Email</label>
+
+                        @if(session('success'))
+                            <p class="text-green-400 text-sm mt-1">{{ session('success') }}</p>
+                        @endif
+
+                        @if(session('error'))
+                            <p class="text-red-400 text-sm mt-1">{{ session('error') }}</p>
+                        @endif
+
+                        @if(session('warning'))
+                            <p class="text-yellow-400 text-sm mt-1">{{ session('warning') }}</p>
+                        @endif
+
+                        @if($errors->any())
+                            <p class="text-red-400 text-sm mt-1">{{ $errors->first('email') }}</p>
+                        @endif
+
+                        <div class="mt-2">
+                            <div class="flex items-center rounded-md bg-white/5 pl-3 outline-1 -outline-offset-1 outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-500">
+                                <input id="email" type="email" name="email" placeholder="juandelacruz@umindanao.edu.ph" class="block min-w-0 grow bg-transparent py-1.5 pr-3 pl-1 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-sm/6" />
+                            </div>
+                            <div class="mt-3 flex items-center gap-x-6 justify-end">
+                                <button type="submit" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Save</button>
+                            </div>
+                        </div>
+
+                        @if(count(session('emails', [])) >= 5)
+                            <p class="text-yellow-400 text-sm mt-2">⚠️ Maximum of 5 emails reached!</p>
+                        @endif
+
+                    </div>
+                </div>
             </div>
-            <div class="mt-3 flex items-center gap-x-6 justify-end">
-            <button type="submit" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Save</button>
-            </div>
-        </form>
-          </div>
-          <div class="mt-3 p-5">
-            <h2 class="text-lg font-semibold text-white">Emails</h2>
-        <ul>
-            @foreach ($emails as $email)
-                <li class="text-sm p-1">{{ $email }}</li>
-            @endforeach
-          </div>
         </div>
-      </div>
+    </form>  {{-- ✅ MAIN FORM CLOSES HERE --}}
+
+    {{-- ✅ EMAIL LIST IS NOW OUTSIDE THE MAIN FORM --}}
+    <div class="mt-3 p-10">
+        <h2 class="text-lg font-semibold text-white">Emails</h2>
+        <ul>
+            @foreach(session('emails', []) as $index => $email)
+                <li class="text-sm p-1 flex items-center gap-x-3">
+                    {{ $email }}
+                    <form method="POST" action="/formtest/delete" style="display:inline;">
+                        @csrf
+                        <input type="hidden" name="index" value="{{ $index }}" />
+                        <button type="submit" class="text-red-400 text-xs">Delete</button>
+                    </form>
+                </li>
+            @endforeach
+        </ul>
     </div>
-  </div>
+
 </x-layout>
